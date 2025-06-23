@@ -1,6 +1,7 @@
 // Employee Payroll Application
 import readline from "readline";
 
+// Employee class
 class Employee {
   constructor(empId, empName) {
     this.empId = empId;
@@ -18,7 +19,7 @@ class Employee {
   }
 
   markAttendance() {
-    let attendanceType = Math.floor(Math.random() * 3);
+    const attendanceType = Math.floor(Math.random() * 3);
     switch (attendanceType) {
       case 0:
         this.attendance = "Absent";
@@ -31,8 +32,6 @@ class Employee {
       case 2:
         this.attendance = "Full-Time";
         this.workingHours = 8;
-        break;
-      default:
         break;
     }
   }
@@ -54,81 +53,99 @@ class Employee {
 
   displayMonthlySummary(companyName) {
     console.log(`----------------------------------------------`);
-    console.log(`\n Monthly Summary for ${this.empName} (ID: ${this.empId}) at ${companyName} Company:`);
+    console.log(
+      `\n Monthly Summary for ${this.empName} (ID: ${this.empId}) at ${companyName} Company:`
+    );
     console.log(`Total Working Hours: ${this.totalWorkingHours}`);
     console.log(`Total Working Days: ${this.totalWorkingDays}`);
-    console.log(`Total Wage for the Month: ₹${this.totalWage}`);
+    console.log(`Total Wage: ₹${this.totalWage}`);
     console.log();
   }
+}
 
-  static computeWagesForAll(employeeList, companyName, wagePerHour, maxWorkingDays, maxWorkingHours) {
-    console.log(`\nCalculating wages for company:  ${companyName}\n`);
+// Company Wage Builder
+class EmpWageBuilder {
+  constructor(companyName, wagePerHour, maxWorkingDays, maxWorkingHours) {
+    this.companyName = companyName;
+    this.wagePerHour = wagePerHour;
+    this.maxWorkingDays = maxWorkingDays;
+    this.maxWorkingHours = maxWorkingHours;
+    this.employeeeDetailsList = [];
+    this.totalCompanyWage = 0;
+  }
 
-    employeeList.forEach((employee) => {
-      console.log(`----------------------------------------------`);
-      console.log(`Daily details of Employee : ${employee.empName} with ID: ${employee.empId}`);
+  addEmployee(empId, empName) {
+    const employee = new Employee(empId, empName);
+    this.employeeeDetailsList.push(employee);
+  }
+
+  computeWagesForCompany() {
+    console.log(`\nCalculated wages for company:  ${this.companyName}\n `);
+
+    this.employeeeDetailsList.forEach((employee) => {
+      console.log(`\n----------------------------------------------`);
+      console.log(
+        `Daily details of Employee : ${employee.empName} with ID: ${employee.empId}`
+      );
       console.log(`----------------------------------------------`);
       let day = 1;
-
       while (
-        day <= maxWorkingDays &&
-        employee.totalWorkingHours < maxWorkingHours
+        day <= this.maxWorkingDays &&
+        employee.totalWorkingHours < this.maxWorkingHours
       ) {
         employee.markAttendance();
-        employee.calculateWage(wagePerHour);
+        employee.calculateWage(this.wagePerHour);
         employee.displayDetails(day);
         day++;
       }
 
-      employee.displayMonthlySummary(companyName);
+      employee.displayMonthlySummary(this.companyName);
+      this.totalCompanyWage += employee.totalWage;
     });
+
+    console.log(
+      `Total wage for company ${this.companyName} is: ₹${this.totalCompanyWage}`
+    );
   }
 }
 
+// Readline Interface Setup
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-let empDetails = [];
+let companyList = [];
+let totalCompanies = 0;
+let currentCompany = 0;
+let currentBuilder = null;
 let numberOfEmployees = 0;
-let count = 0;
-let companyName = "";
-let wagePerHour = 0;
-let maxWorkingDays = 0;
-let maxWorkingHours = 0;
+let employeeIndex = 0;
+
+// Application Start
+function askTotalCompanies() {
+  rl.question("How many companies you want to add?: ", (count) => {
+    totalCompanies = parseInt(count);
+    askCompanyDetails();
+  });
+}
 
 function askCompanyDetails() {
-  rl.question("Enter Company Name: ", (name) => {
-    companyName = name;
-    console.log(`Welcome to ${companyName} Employee Payroll Application\n`);
-    rl.question("Enter wage per hour: ", (wage) => {
-      wagePerHour = parseInt(wage);
-      rl.question("Enter Max Working Days: ", (days) => {
-        maxWorkingDays = parseInt(days);
-        rl.question("Enter Max Working Hours: ", (hours) => {
-          maxWorkingHours = parseInt(hours);
-          askEmployeeCount();
+  if (currentCompany < totalCompanies) {
+    console.log(`\n ---Entering details of company ${currentCompany + 1}---\n`);
+    rl.question("Enter Company Name: ", (name) => {
+      rl.question("Enter wage per hour: ", (wage) => {
+        rl.question("Enter Max Working Days: ", (days) => {
+          rl.question("Enter Max Working Hours: ", (hours) => {
+            currentBuilder = new EmpWageBuilder(
+              name,
+              parseInt(wage),
+              parseInt(days),
+              parseInt(hours)
+            );
+            askEmployeeCount();
+          });
         });
-      });
-    });
-  });
-}
-
-function askEmployeeCount() {
-  rl.question("How many employees you want to add?: ", (answer) => {
-    numberOfEmployees = parseInt(answer);
-    askEmployeeDetails();
-  });
-}
-
-function askEmployeeDetails() {
-  if (count < numberOfEmployees) {
-    rl.question(`Enter Employee ID for Employee ${count + 1}: `, (empId) => {
-      rl.question(`Enter Employee Name for Employee ${count + 1}: `, (empName) => {
-        empDetails.push(new Employee(parseInt(empId), empName));
-        count++;
-        askEmployeeDetails();
       });
     });
   } else {
@@ -137,9 +154,43 @@ function askEmployeeDetails() {
   }
 }
 
-function startApplication() {
-  Employee.computeWagesForAll(empDetails, companyName, wagePerHour, maxWorkingDays, maxWorkingHours);
+function askEmployeeCount() {
+  rl.question("How many employees you want to add?: ", (count) => {
+    numberOfEmployees = parseInt(count);
+    employeeIndex = 0;
+    askEmployeeDetails();
+  });
 }
 
+function askEmployeeDetails() {
+  if (employeeIndex < numberOfEmployees) {
+    rl.question(
+      `Enter Employee ID for Employee ${employeeIndex + 1}: `,
+      (empId) => {
+        rl.question(
+          `Enter Employee Name for Employee ${employeeIndex + 1}: `,
+          (empName) => {
+            currentBuilder.addEmployee(parseInt(empId), empName);
+            employeeIndex++;
+            askEmployeeDetails();
+          }
+        );
+      }
+    );
+  } else {
+    companyList.push(currentBuilder);
+    currentCompany++;
+    askCompanyDetails();
+  }
+}
+
+function startApplication() {
+  Employee.displayMessage();
+  companyList.forEach((builder) => {
+    builder.computeWagesForCompany();
+  });
+}
+
+// Entry point
 Employee.displayMessage();
-askCompanyDetails();
+askTotalCompanies();
