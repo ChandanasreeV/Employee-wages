@@ -10,6 +10,7 @@ class Employee {
     // UC4 - Monthly Wage Tracking
     this.totalWage = 0; // Total wage for the month
     this.totalWorkingHours = 0; // Total working hours for the month
+    this.totalWorkingDays = 0; // Total working days for the month
   }
 
   displayMessage() {
@@ -18,18 +19,18 @@ class Employee {
 
   // Method to mark attendance randomly
   markAttendance() {
-    let attendanceType = Math.floor(Math.random() * 3); // Random attendance
+    let attendanceType = Math.floor(Math.random() * 3);
     switch (attendanceType) {
       case 0:
-        this.attendance = "Absent";       // UC1
+        this.attendance = "Absent";
         this.workingHours = 0;
         break;
       case 1:
-        this.attendance = "Part-Time";    // UC1
+        this.attendance = "Part-Time";
         this.workingHours = 4;
         break;
       case 2:
-        this.attendance = "Full-Time";    // UC1
+        this.attendance = "Full-Time";
         this.workingHours = 8;
         break;
       default:
@@ -37,18 +38,21 @@ class Employee {
     }
   }
 
-  // UC2 - Calculate daily wage based on attendance
+  // UC2 - For calculating daily wage based on attendance
   calculateWage() {
     const WAGE_PER_HOUR = 20;
     this.dailyWage = WAGE_PER_HOUR * this.workingHours;
-    this.totalWage += this.dailyWage;               // UC4
-    this.totalWorkingHours += this.workingHours;    // UC4
+    this.totalWage += this.dailyWage;
+    this.totalWorkingHours += this.workingHours;
+    if (this.attendance !== "Absent") {
+      this.totalWorkingDays++;
+    }
   }
 
-  // UC3 - Display daily employee details
+  // Method to display employee details
   displayDetails(day) {
     console.log(
-      `Day ${day} - Employee ID: ${this.empId}, Name: ${this.empName}, Attendance: ${this.attendance}, Working Hours: ${this.workingHours}, Daily Wage: ₹${this.dailyWage}`
+      `Day ${day} - Attendance: ${this.attendance}, Working Hours: ${this.workingHours}, Daily Wage: ${this.dailyWage}`
     );
   }
 
@@ -56,6 +60,7 @@ class Employee {
   displayMonthlySummary() {
     console.log(`\nMonthly Summary for ${this.empName} (ID: ${this.empId}):`);
     console.log(`Total Working Hours: ${this.totalWorkingHours}`);
+    console.log(`Total Working Days: ${this.totalWorkingDays}`);
     console.log(`Total Wage for the Month: ₹${this.totalWage}`);
     console.log(`----------------------------------------------`);
   }
@@ -72,15 +77,21 @@ let empDetails = [
   new Employee(12, "Sunaina"),
 ];
 
-const Working_Days = 20; // Assuming 20 working days in a month
+const MAX_WORKING_DAYS = 20;
+const MAX_WORKING_HOURS = 100;
 
-// Simulate monthly attendance and wage calculation
+// Process each employee
 empDetails.forEach((employee) => {
-  console.log(`\nDaily details of Employee: ${employee.empName}`);
-  for (let day = 1; day <= Working_Days; day++) {
-    employee.markAttendance();     // UC1
-    employee.calculateWage();      // UC2
-    employee.displayDetails(day);  // UC3
+  console.log(`Daily details of Employee: ${employee.empName} with ID: ${employee.empId}`);
+  let day = 1;
+
+  while (day <= MAX_WORKING_DAYS && employee.totalWorkingHours < MAX_WORKING_HOURS) {
+    employee.markAttendance();      // UC1
+    employee.calculateWage();       // UC2
+    employee.displayDetails(day);   // UC3
+    day++;
   }
+
   employee.displayMonthlySummary(); // UC4
+  console.log("--------------------------------------------------");
 });
