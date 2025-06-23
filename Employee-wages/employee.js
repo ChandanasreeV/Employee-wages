@@ -1,7 +1,7 @@
 // Employee Payroll Application
 import readline from "readline";
 
-// Employee class
+// Renamed from EmployeePayroll to Employee
 class Employee {
   constructor(empId, empName) {
     this.empId = empId;
@@ -63,8 +63,8 @@ class Employee {
   }
 }
 
-// Company Wage Builder
-class EmpWageBuilder {
+// Company class
+class CompanyEmpWage {
   constructor(companyName, wagePerHour, maxWorkingDays, maxWorkingHours) {
     this.companyName = companyName;
     this.wagePerHour = wagePerHour;
@@ -80,14 +80,15 @@ class EmpWageBuilder {
   }
 
   computeWagesForCompany() {
-    console.log(`\nCalculated wages for company:  ${this.companyName}\n `);
+    console.log(`\nCalculated wages for company:  ${this.companyName}\n`);
 
     this.employeeeDetailsList.forEach((employee) => {
-      console.log(`\n----------------------------------------------`);
+      console.log(`----------------------------------------------`);
       console.log(
         `Daily details of Employee : ${employee.empName} with ID: ${employee.empId}`
       );
       console.log(`----------------------------------------------`);
+
       let day = 1;
       while (
         day <= this.maxWorkingDays &&
@@ -109,20 +110,36 @@ class EmpWageBuilder {
   }
 }
 
-// Readline Interface Setup
+// Builder for multiple companies
+class EmpWageBuilder {
+  constructor() {
+    this.companies = [];
+  }
+
+  addCompany(company) {
+    this.companies.push(company);
+  }
+
+  computeAllCompanyWages() {
+    this.companies.forEach((company) => {
+      company.computeWagesForCompany();
+    });
+  }
+}
+
+// CLI interaction
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-let companyList = [];
 let totalCompanies = 0;
 let currentCompany = 0;
 let currentBuilder = null;
 let numberOfEmployees = 0;
 let employeeIndex = 0;
+let builder = new EmpWageBuilder();
 
-// Application Start
 function askTotalCompanies() {
   rl.question("How many companies you want to add?: ", (count) => {
     totalCompanies = parseInt(count);
@@ -137,7 +154,7 @@ function askCompanyDetails() {
       rl.question("Enter wage per hour: ", (wage) => {
         rl.question("Enter Max Working Days: ", (days) => {
           rl.question("Enter Max Working Hours: ", (hours) => {
-            currentBuilder = new EmpWageBuilder(
+            currentBuilder = new CompanyEmpWage(
               name,
               parseInt(wage),
               parseInt(days),
@@ -178,7 +195,7 @@ function askEmployeeDetails() {
       }
     );
   } else {
-    companyList.push(currentBuilder);
+    builder.addCompany(currentBuilder);
     currentCompany++;
     askCompanyDetails();
   }
@@ -186,9 +203,7 @@ function askEmployeeDetails() {
 
 function startApplication() {
   Employee.displayMessage();
-  companyList.forEach((builder) => {
-    builder.computeWagesForCompany();
-  });
+  builder.computeAllCompanyWages();
 }
 
 // Entry point
