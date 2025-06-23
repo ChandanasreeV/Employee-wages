@@ -16,15 +16,21 @@ class Employee {
   // Method to mark attendance randomly
   markAttendance() {
     let attendanceType = Math.floor(Math.random() * 3); // Random attendance
-    if (attendanceType === 0) {
-      this.attendance = "Absent";
-      this.workingHours = 0;
-    } else if (attendanceType === 1) {
-      this.attendance = "Present";
-      this.workingHours = 8;
-    } else {
-      this.attendance = "Half Day";
-      this.workingHours = 4;
+    switch (attendanceType) {
+      case 0:
+        this.attendance = "Absent";        // UC1 - Absent
+        this.workingHours = 0;
+        break;
+      case 1:
+        this.attendance = "Part-Time";     // UC1 - Part-Time
+        this.workingHours = 4;
+        break;
+      case 2:
+        this.attendance = "Full-Time";     // UC1 - Full-Time
+        this.workingHours = 8;
+        break;
+      default:
+        break;
     }
   }
 
@@ -53,9 +59,9 @@ let empDetails = [
   new Employee(12, "Sunaina"),
 ];
 
-// Mark attendance, calculate wage, and display details
+// Process and display each employee's data
 empDetails.forEach((employee) => {
   employee.markAttendance();
-  employee.calculateWage(); // UC2
+  employee.calculateWage(); // UC2 + UC3 logic
   employee.displayDetails();
 });
