@@ -6,6 +6,7 @@ class Employee {
     this.empName = empName;
     this.attendance = "";
     this.dailyWage = 0;
+    this.workingHours = 0; // UC3 - Adding working hours property
   }
 
   displayMessage() {
@@ -14,22 +15,29 @@ class Employee {
 
   // Method to mark attendance randomly
   markAttendance() {
-    let isPresent = Math.floor(Math.random() * 2);
-    this.attendance = isPresent ? "Present" : "Absent";
+    let attendanceType = Math.floor(Math.random() * 3); // Random attendance
+    if (attendanceType === 0) {
+      this.attendance = "Absent";
+      this.workingHours = 0;
+    } else if (attendanceType === 1) {
+      this.attendance = "Present";
+      this.workingHours = 8;
+    } else {
+      this.attendance = "Half Day";
+      this.workingHours = 4;
+    }
   }
 
-  // UC2 - For calculating daily wage based on attendance
+  // UC2 - Calculate daily wage based on working hours
   calculateWage() {
     const WAGE_PER_HOUR = 20;
-    const WORKING_HOURS = 8;
-    const dailyWage = WAGE_PER_HOUR * WORKING_HOURS;
-    this.dailyWage = this.attendance === "Present" ? dailyWage : 0;
+    this.dailyWage = WAGE_PER_HOUR * this.workingHours;
   }
 
-  // Method to display employee details
+  // Display employee details
   displayDetails() {
     console.log(
-      `Employee ID: ${this.empId}, Name: ${this.empName}, Attendance: ${this.attendance}, Daily Wage: ${this.dailyWage}`
+      `Employee ID: ${this.empId}, Name: ${this.empName}, Attendance: ${this.attendance}, Working Hours: ${this.workingHours}, Daily Wage: ${this.dailyWage}`
     );
   }
 }
@@ -40,14 +48,14 @@ employee.displayMessage();
 
 // Create employee objects
 let empDetails = [
-  new Employee(11, "Pooja"),
-  new Employee(41, "Deepika"),
-  new Employee(12, "Lakshmi"),
+  new Employee(11, "Chandana"),
+  new Employee(41, "Sree"),
+  new Employee(12, "Sunaina"),
 ];
 
 // Mark attendance, calculate wage, and display details
 empDetails.forEach((employee) => {
   employee.markAttendance();
-  employee.calculateWage(); // UC2: calculate daily wage
+  employee.calculateWage(); // UC2
   employee.displayDetails();
 });
