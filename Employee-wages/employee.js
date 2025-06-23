@@ -1,13 +1,7 @@
 // Employee Payroll Application
-import { log } from "console";
 import readline from "readline";
 
 class Employee {
-  //UC7 - Refactor the code to write class variables and methods
-  static MAX_WORKING_DAYS = 20;
-  static MAX_WORKING_HOURS = 100;
-  static WAGE_PER_HOUR = 20;
-
   constructor(empId, empName) {
     this.empId = empId;
     this.empName = empName;
@@ -43,8 +37,8 @@ class Employee {
     }
   }
 
-  calculateWage() {
-    this.dailyWage = Employee.WAGE_PER_HOUR * this.workingHours;
+  calculateWage(wagePerHour) {
+    this.dailyWage = wagePerHour * this.workingHours;
     this.totalWage += this.dailyWage;
     this.totalWorkingHours += this.workingHours;
     if (this.attendance !== "Absent") {
@@ -58,16 +52,18 @@ class Employee {
     );
   }
 
-  displayMonthlySummary() {
+  displayMonthlySummary(companyName) {
     console.log(`----------------------------------------------`);
-    console.log(`\n Monthly Summary for ${this.empName} (ID: ${this.empId}):`);
+    console.log(`\n Monthly Summary for ${this.empName} (ID: ${this.empId}) at ${companyName} Company:`);
     console.log(`Total Working Hours: ${this.totalWorkingHours}`);
     console.log(`Total Working Days: ${this.totalWorkingDays}`);
     console.log(`Total Wage for the Month: ₹${this.totalWage}`);
     console.log();
   }
 
-  static computeWagesForAll(employeeList) {
+  static computeWagesForAll(employeeList, companyName, wagePerHour, maxWorkingDays, maxWorkingHours) {
+    console.log(`\nCalculating wages for company:  ${companyName}\n`);
+
     employeeList.forEach((employee) => {
       console.log(`----------------------------------------------`);
       console.log(`Daily details of Employee : ${employee.empName} with ID: ${employee.empId}`);
@@ -75,16 +71,16 @@ class Employee {
       let day = 1;
 
       while (
-        day <= Employee.MAX_WORKING_DAYS &&
-        employee.totalWorkingHours < Employee.MAX_WORKING_HOURS
+        day <= maxWorkingDays &&
+        employee.totalWorkingHours < maxWorkingHours
       ) {
         employee.markAttendance();
-        employee.calculateWage();
+        employee.calculateWage(wagePerHour);
         employee.displayDetails(day);
         day++;
       }
 
-      employee.displayMonthlySummary();
+      employee.displayMonthlySummary(companyName);
     });
   }
 }
@@ -97,6 +93,27 @@ const rl = readline.createInterface({
 let empDetails = [];
 let numberOfEmployees = 0;
 let count = 0;
+let companyName = "";
+let wagePerHour = 0;
+let maxWorkingDays = 0;
+let maxWorkingHours = 0;
+
+function askCompanyDetails() {
+  rl.question("Enter Company Name: ", (name) => {
+    companyName = name;
+    console.log(`Welcome to ${companyName} Employee Payroll Application\n`);
+    rl.question("Enter wage per hour: ", (wage) => {
+      wagePerHour = parseInt(wage);
+      rl.question("Enter Max Working Days: ", (days) => {
+        maxWorkingDays = parseInt(days);
+        rl.question("Enter Max Working Hours: ", (hours) => {
+          maxWorkingHours = parseInt(hours);
+          askEmployeeCount();
+        });
+      });
+    });
+  });
+}
 
 function askEmployeeCount() {
   rl.question("How many employees you want to add?: ", (answer) => {
@@ -121,8 +138,8 @@ function askEmployeeDetails() {
 }
 
 function startApplication() {
-  Employee.computeWagesForAll(empDetails);
+  Employee.computeWagesForAll(empDetails, companyName, wagePerHour, maxWorkingDays, maxWorkingHours);
 }
 
 Employee.displayMessage();
-askEmployeeCount();
+askCompanyDetails();
