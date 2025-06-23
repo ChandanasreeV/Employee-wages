@@ -1,14 +1,15 @@
-// Employee  Application
+// Employee Payroll Application
 class Employee {
-  displayMessage() {
-    console.log("Welcome to Employee Payroll Application");
-  }
-
   // Constructor to initialize employee details
   constructor(empId, empName) {
     this.empId = empId;
     this.empName = empName;
     this.attendance = "";
+    this.dailyWage = 0;
+  }
+
+  displayMessage() {
+    console.log("Welcome to Employee Payroll Application");
   }
 
   // Method to mark attendance randomly
@@ -17,27 +18,36 @@ class Employee {
     this.attendance = isPresent ? "Present" : "Absent";
   }
 
+  // UC2 - For calculating daily wage based on attendance
+  calculateWage() {
+    const WAGE_PER_HOUR = 20;
+    const WORKING_HOURS = 8;
+    const dailyWage = WAGE_PER_HOUR * WORKING_HOURS;
+    this.dailyWage = this.attendance === "Present" ? dailyWage : 0;
+  }
+
   // Method to display employee details
   displayDetails() {
     console.log(
-      `Employee ID: ${this.empId}, Name: ${this.empName}, Attendance: ${this.attendance}`
+      `Employee ID: ${this.empId}, Name: ${this.empName}, Attendance: ${this.attendance}, Daily Wage: ${this.dailyWage}`
     );
   }
 }
 
-// Create a sample Employee object and call displayMessage
+// Display welcome message
 const employee = new Employee();
 employee.displayMessage();
 
 // Create employee objects
 let empDetails = [
-  new Employee(11, "Chandana"),
-  new Employee(41, "Sree"),
-  new Employee(12, "Sunaina"),
+  new Employee(11, "Pooja"),
+  new Employee(41, "Deepika"),
+  new Employee(12, "Lakshmi"),
 ];
 
-// Mark attendance and display details
+// Mark attendance, calculate wage, and display details
 empDetails.forEach((employee) => {
   employee.markAttendance();
+  employee.calculateWage(); // UC2: calculate daily wage
   employee.displayDetails();
 });
