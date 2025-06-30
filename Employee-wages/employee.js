@@ -40,9 +40,9 @@ employee.displayMessage();
 
 // Create employee objects
 let empDetails = [
-  new Employee(11, "Pooja"),
-  new Employee(41, "Deepika"),
-  new Employee(12, "Lakshmi"),
+  new Employee(11, "Chandana"),
+  new Employee(41, "Sree"),
+  new Employee(12, "Sunaina"),
 ];
 
 // Mark attendance, calculate wage, and display details
